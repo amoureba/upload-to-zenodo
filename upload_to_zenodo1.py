@@ -4,7 +4,7 @@ import os
 import sys
 import codecs
 
-BASE_URL = "http://bibliotheque.uvci.edu.ci"  # TODO: once you are sure about what you are doing, remove the "sandbox." part
+BASE_URL = "https://sandbox.zenodo.org" # TODO: once you are sure about what you are doing, remove the "sandbox." part
 TOKEN = ""
 
 def upload(metadata, pdf_path):
@@ -12,17 +12,10 @@ def upload(metadata, pdf_path):
         return
 
     # Create new paper submission
-    params = {'access_token': TOKEN}
-    # Create the deposit resource
-    url = "{base_url}/api/deposit/depositions".format(base_url=BASE_URL)
+    url = "{base_url}/api/deposit/depositions/?access_token={token}".format(base_url=BASE_URL, token=TOKEN)
     headers = {"Content-Type": "application/json"}
-    response = requests.post(
-        url,
-        json=json.loads(metadata),
-        headers=headers,
-        params=params,
-    )
-
+    response = requests.post(url, data=metadata, headers=headers)
+    #print(response.text)
     if response.status_code > 210:
         print("Error happened during submission, status code: " + str(response.status_code))
         return
@@ -31,27 +24,24 @@ def upload(metadata, pdf_path):
     submission_id = json.loads(response.text)["id"]
 
     # Upload the file
-    url = "{base_url}/api/deposit/depositions/{id}/files?access_token={token}".format(base_url=BASE_URL,
-                                                                                      id=str(submission_id),
-                                                                                      token=TOKEN)
+    url = "{base_url}/api/deposit/depositions/{id}/files?access_token={token}".format(base_url=BASE_URL, id=str(submission_id), token=TOKEN)
     upload_metadata = {'filename': 'paper.pdf'}
     files = {'file': open(pdf_path, 'rb')}
     response = requests.post(url, data=upload_metadata, files=files)
-    # print(response.text)
+    #print(response.text)
     if response.status_code > 210:
         print("Error happened during file upload, status code: " + str(response.status_code))
         return
-
-    print(
-        "{file} submitted with submission ID = {id} (DOI: 10.5281/zenodo.{id})".format(file=pdf_path, id=submission_id))
+    
+    print("{file} submitted with submission ID = {id} (DOI: 10.5281/zenodo.{id})".format(file=pdf_path,id=submission_id))    
     # The submission needs an additional "Publish" step. This can also be done from a script, but to be on the safe side, it is not included. (The attached file cannot be changed after publication.)
-
-
+    
+    
 def batch_upload(directory):
     for metadata_file in os.listdir(directory):
         metadata_file = os.path.join(directory, metadata_file)
         if metadata_file.endswith(".json"):
-            pdf_file = metadata_file.replace(".json", ".pdf")
+            pdf_file = metadata_file.replace(".json",".pdf")
             if os.path.isfile(pdf_file):
                 print("Uploading %s & %s" % (metadata_file, pdf_file))
                 with codecs.open(metadata_file, 'r', 'utf-8') as f:
@@ -59,13 +49,13 @@ def batch_upload(directory):
                     # Re-encoding in order to support UTF-8 inputs
                     metadata_json = json.loads(metadata)
                     metadata = json.dumps(metadata_json, ensure_ascii=True)
-                    # print(metadata)
-                upload(metadata, pdf_file)
+                    #print(metadata)
+                #upload(metadata, pdf_file)
+                print (metadata)
             else:
-                print("The file %s might be a submission metadata file, but %s does not exist." % (
-                    metadata_file, pdf_file))
-
-
+                print("The file %s might be a submission metadata file, but %s does not exist." % (metadata_file, pdf_file))
+           
+           
 def _is_valid_json(text):
     try:
         json.loads(text)
@@ -80,11 +70,11 @@ if __name__ == "__main__":
         print("Usage: upload_to_zenodo.py <token> <directory>")
         print("  The directory contains .json metadata descriptors and .pdf files.")
         exit()
-
+    
     TOKEN = sys.argv[1]
     directory = sys.argv[2]
     if not os.path.isdir(directory):
         print("Invalid directory.")
         exit()
-
+   
     batch_upload(directory)
