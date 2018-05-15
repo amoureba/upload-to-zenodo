@@ -4,8 +4,7 @@ import os
 import sys
 import codecs
 
-# BASE_URL = "https://sandbox.zenodo.org" # TODO: once you are sure about what you are doing, remove the "sandbox." part
-BASE_URL = "http://bibliotheque.uvci.edu.ci"
+BASE_URL = "https://sandbox.zenodo.org"  # TODO: once you are sure about what you are doing, remove the "sandbox." part
 TOKEN = ""
 
 
