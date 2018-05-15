@@ -4,8 +4,10 @@ import os
 import sys
 import codecs
 
-BASE_URL = "http://bibliotheque.uvci.edu.ci"  # TODO: once you are sure about what you are doing, remove the "sandbox." part
+# BASE_URL = "https://sandbox.zenodo.org" # TODO: once you are sure about what you are doing, remove the "sandbox." part
+BASE_URL = "http://bibliotheque.uvci.edu.ci"
 TOKEN = ""
+
 
 def upload(metadata, pdf_path):
     if not _is_valid_json(metadata):
@@ -18,10 +20,11 @@ def upload(metadata, pdf_path):
     headers = {"Content-Type": "application/json"}
     response = requests.post(
         url,
-        json=json.loads(metadata),
+        json=metadata,
         headers=headers,
         params=params,
     )
+    print(metadata)
 
     if response.status_code > 210:
         print("Error happened during submission, status code: " + str(response.status_code))

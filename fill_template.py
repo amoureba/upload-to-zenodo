@@ -25,7 +25,7 @@ def fill_template(template_filename, data_filename):
                     print(("    {%s} = %s" % (column, row[column])).encode().decode('cp850'))
 
             # Write to output file
-            output_filename = os.path.join('/home/vagrant/src/upload-to-zenodo/ags', unicode(output_filename))
+            output_filename = os.path.join('E:/projet_python/upload-to-zenodo/ags', unicode(output_filename))
             with io.open(output_filename, "w", encoding='utf-8') as output_file:
                 output_file.write(unicode(filled_template))
 
