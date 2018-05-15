@@ -19,11 +19,11 @@ def upload(metadata, pdf_path):
     headers = {"Content-Type": "application/json"}
     response = requests.post(
         url,
-        json=metadata,
+        json=json.loads(metadata),
         headers=headers,
         params=params,
     )
-    print(metadata)
+    print(json.loads(metadata))
 
     if response.status_code > 210:
         print("Error happened during submission, status code: " + str(response.status_code))
